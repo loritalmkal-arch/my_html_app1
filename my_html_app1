@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apple of Fortune</title>
+<style>
+  body {
+    background: #111;
+    color: #fff;
+    font-family: 'Cairo', sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+  }
+
+  .screen {
+    display: none;
+    padding: 20px;
+  }
+
+  .active {
+    display: block;
+  }
+
+  input, select, button {
+    width: 80%;
+    padding: 10px;
+    margin: 10px auto;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+  }
+
+  input, select {
+    background: #222;
+    color: #fff;
+  }
+
+  button {
+    background: #2196F3;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+  }
+
+  button:hover {
+    background: #1976D2;
+  }
+
+  .links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 25px 0;
+  }
+
+  .link-btn {
+    background: #333;
+    border-radius: 10px;
+    padding: 10px 15px;
+    font-size: 14px;
+    text-decoration: none;
+    color: #fff;
+    display: inline-block;
+    transition: 0.2s;
+  }
+
+  .link-btn:hover {
+    background: #4CAF50;
+  }
+
+  .circles {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+    gap: 15px;
+  }
+
+  .circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: #555;
+    transition: 0.3s;
+  }
+
+  .circle.active {
+    background: #4CAF50;
+    box-shadow: 0 0 25px #4CAF50;
+  }
+
+  .btn-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+  }
+
+  .progress {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #ccc;
+  }
+</style>
+</head>
+<body>
+
+<!-- شاشة البداية -->
+<div id="lobby" class="screen active">
+  <h2>🎮 اختر المنصة وأدخل ID الحساب</h2>
+  <select id="platform">
+    <option value="">اختر منصة</option>
+    <option value="1xbet">1XBET</option>
+  </select>
+  <input id="userId" type="text" placeholder="أدخل ID الحساب">
+  <button onclick="verifyServer()">دخول</button>
+</div>
+
+<!-- شاشة التحقق -->
+<div id="verify" class="screen">
+  <h2>✅ تحقق من السيرفر</h2>
+  <p>قم بزيارة صفحات المطور قبل المتابعة:</p>
+  
+  <div class="links">
+    <a href="https://www.facebook.com/profile.php?id=61582803086679" class="link-btn" target="_blank" onclick="markVisited(0)">Facebook</a>
+    <a href="https://www.instagram.com/grand_blaze?igsh=Mjd1ajMzbmhvNm80" class="link-btn" target="_blank" onclick="markVisited(1)">Instagram</a>
+    <a href="https://whatsapp.com/channel/0029VbBxTyz8fewziw81FL3t" class="link-btn" target="_blank" onclick="markVisited(2)">WhatsApp</a>
+  </div>
+
+  <button id="continueBtn" disabled>Continue 0/3</button>
+  <p class="progress" id="progressText">قم بزيارة جميع الصفحات للمتابعة</p>
+</div>
+
+<!-- شاشة اللعبة -->
+<div id="game" class="screen">
+  <h2>🍏 Apple of Fortune</h2>
+  <div class="circles" id="circles"></div>
+
+  <div class="btn-container">
+    <button onclick="play()">اللعب</button>
+    <button onclick="resetGame()" style="background:#f44336;">إعادة اللعب</button>
+  </div>
+</div>
+
+<script>
+let totalCircles = 5;
+let visited = [false, false, false];
+
+function showScreen(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+}
+
+function verifyServer() {
+  const platform = document.getElementById('platform').value;
+  const id = document.getElementById('userId').value.trim();
+
+  if (!platform) {
+    alert("الرجاء اختيار المنصة");
+    return;
+  }
+  if (!id) {
+    alert("الرجاء إدخال ID الحساب");
+    return;
+  }
+
+  showScreen('verify');
+}
+
+function markVisited(index) {
+  visited[index] = true;
+  updateProgress();
+}
+
+function updateProgress() {
+  const count = visited.filter(v => v).length;
+  const continueBtn = document.getElementById('continueBtn');
+  continueBtn.innerText = `Continue ${count}/3`;
+  document.getElementById('progressText').innerText = `تمت زيارة ${count} من أصل 3`;
+
+  if (count >= 3) {
+    continueBtn.disabled = false;
+    continueBtn.style.background = "#4CAF50";
+    continueBtn.onclick = () => {
+      showScreen('game');
+      generateCircles();
+    };
+  }
+}
+
+function generateCircles() {
+  const container = document.getElementById('circles');
+  container.innerHTML = '';
+  for (let i = 0; i < totalCircles; i++) {
+    const circle = document.createElement('div');
+    circle.classList.add('circle');
+    container.appendChild(circle);
+  }
+}
+
+function play() {
+  const circles = document.querySelectorAll('.circle');
+  circles.forEach(c => c.classList.remove('active'));
+  const randomIndex = Math.floor(Math.random() * circles.length);
+  circles[randomIndex].classList.add('active');
+}
+
+function resetGame() {
+  const circles = document.querySelectorAll('.circle');
+  circles.forEach(c => c.classList.remove('active'));
+}
+</script>
+
+</body>
+</html>
